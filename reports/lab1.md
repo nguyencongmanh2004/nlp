@@ -1,54 +1,53 @@
 
-Báo cáo Lab 1: Text Tokenization
-I. Mô tả công việc
 
-Trong Lab 1, mục tiêu chính là tìm hiểu và triển khai bước tiền xử lý cơ bản và quan trọng trong NLP: tách từ (tokenization). Công việc được chia thành các phần chính sau:
+# Báo cáo Lab 1: Text Tokenization
 
-Thiết kế Interface Tokenizer:
+---
 
-Để đảm bảo tính nhất quán và khả năng mở rộng, em đã tạo một lớp trừu tượng (abstract base class) có tên Tokenizer trong file src/core/interfaces.py.
+## I. Mô tả công việc
 
-Interface này định nghĩa một phương thức bắt buộc là tokenize(self, text: str) -> list[str]. Mọi lớp tokenizer được triển khai sau này đều phải kế thừa từ interface này và cài đặt phương thức tokenize, giúp cho cấu trúc của dự án rõ ràng và dễ bảo trì.
+Trong Lab 1, em đã triển khai các thành phần cơ bản để thực hiện **tokenization** (tách từ), một bước tiền xử lý nền tảng trong Xử lý Ngôn ngữ Tự nhiên (NLP).
 
-Cài đặt SimpleTokenizer:
+### 1. Thiết kế Interface `Tokenizer`
 
-Em đã tạo lớp SimpleTokenizer trong file src/preprocessing/simple_tokenizer.py, kế thừa từ Tokenizer.
+Để đảm bảo tính module hóa và dễ mở rộng, một interface trừu tượng đã được định nghĩa:
 
-Phương pháp xử lý:
+-   **File**: `src/core/interfaces.py`
+-   **Lớp**: `Tokenizer` (Abstract Base Class)
+-   **Phương thức**: Định nghĩa một phương thức trừu tượng duy nhất là `tokenize(self, text: str) -> list[str]`. Điều này bắt buộc tất cả các lớp tokenizer kế thừa phải triển khai logic tách từ của riêng mình, trong khi vẫn tuân thủ một cấu trúc chung.
 
-Bước 1: Chuyển sang chữ thường: Toàn bộ văn bản đầu vào được chuyển đổi thành chữ thường bằng phương thức .lower() để đảm bảo tính đồng nhất (ví dụ: "Hello" và "hello" được coi là một).
+### 2. Cài đặt `SimpleTokenizer`
 
-Bước 2: Xử lý dấu câu: Để tách các dấu câu cơ bản (., ,, ?, !) ra khỏi các từ, em đã thêm một khoảng trắng vào trước và sau mỗi dấu câu này trong văn bản.
+Đây là một tokenizer cơ bản, xử lý văn bản bằng các quy tắc đơn giản.
 
-Bước 3: Tách từ: Cuối cùng, văn bản đã được xử lý sẽ được tách thành một danh sách các token dựa trên các khoảng trắng bằng phương thức .split().
+-   **File**: `src/preprocessing/simple_tokenizer.py`
+-   **Logic hoạt động**:
+    1.  **Chuẩn hóa chữ thường**: Toàn bộ văn bản đầu vào được chuyển thành chữ thường bằng phương thức `.lower()`.
+    2.  **Xử lý dấu câu**: Các dấu câu cơ bản (`.`, `,`, `?`, `!`) được tách ra khỏi từ liền kề bằng cách thêm một khoảng trắng vào trước và sau chúng.
+    3.  **Tách từ**: Văn bản sau khi xử lý được tách thành danh sách các token bằng phương thức `.split()` dựa trên khoảng trắng.
 
-Cài đặt RegexTokenizer (Bonus):
+### 3. Cài đặt `RegexTokenizer` (Bonus)
 
-Để có một giải pháp mạnh mẽ và linh hoạt hơn, em đã tạo lớp RegexTokenizer trong file src/preprocessing/regex_tokenizer.py.
+Đây là một tokenizer nâng cao hơn, sử dụng sức mạnh của Biểu thức chính quy (Regular Expressions) để có kết quả tách từ tốt hơn.
 
-Phương pháp xử lý:
+-   **File**: `src/preprocessing/regex_tokenizer.py`
+-   **Logic hoạt động**:
+    -   Sử dụng một biểu thức chính quy duy nhất để tìm tất cả các chuỗi con khớp với mẫu token:
+      ```regex
+      \w+|[^\w\s]
+      ```
+    -   **Giải thích Regex**:
+        -   `\w+`: Tìm và khớp với một hoặc nhiều ký tự "word" (chữ cái `a-z`, `A-Z`; số `0-9`; và dấu gạch dưới `_`).
+        -   `|`: Toán tử "HOẶC".
+        -   `[^\w\s]`: Tìm và khớp với một ký tự bất kỳ **không phải** là ký tự "word" và cũng **không phải** là khoảng trắng. Điều này giúp tách riêng các dấu câu và ký hiệu đặc biệt (`-`, `=`, `#`, `!`, `@`, ...).
 
-Lớp này sử dụng một biểu thức chính quy (regular expression) duy nhất để tìm tất cả các token trong văn bản: \w+|[^\w\s].
+---
 
-Giải thích Regex:
+## II. Kết quả chạy code
 
-\w+: Khớp với một hoặc nhiều ký tự "word" liên tiếp (bao gồm chữ cái, số, và dấu gạch dưới _).
+### 1. Output trên các câu mẫu
 
-|: Toán tử "HOẶC" (OR).
-
-[^\w\s]: Khớp với một ký tự đơn lẻ bất kỳ không phải là ký tự "word" (\w) và cũng không phải là ký tự khoảng trắng (\s). Điều này giúp tách riêng các dấu câu và các ký hiệu đặc biệt khác (-, =, #, ...).
-
-II. Kết quả chạy code
-1. Output trên các câu mẫu
-
-Dưới đây là kết quả khi chạy hai tokenizer trên các câu văn bản mẫu:
-
-code
-Code
-download
-content_copy
-expand_less
-
+```plaintext
 --- Testing SimpleTokenizer and RegexTokenizer ---
 
 Original: "Hello, world! This is a test."
@@ -63,13 +62,12 @@ RegexTokenizer:  ['nlp', 'is', 'fascinating', '.', '.', '.', 'isn', "'", 't', '?
 ---
 Original: "Let's see how it handles 123 numbers and punctuation!"
 SimpleTokenizer: ['let', "'", 's', 'see', 'how', 'it', 'handles', '123', 'numbers', 'and', 'punctuation', '!']
-RegexTokenizer:  ['let', "'", 's', 'see', 'how', 'it', 'handles', '123', 'numbers', 'and', 'punctuation', '!']```
+RegexTokenizer:  ['let', "'", 's', 'see', 'how', 'it', 'handles', '123', 'numbers', 'and', 'punctuation', '!']
+2. Output trên dataset UD_English-EWT
 
-### **2. Output trên dataset UD_English-EWT**
+Kết quả khi áp dụng trên 500 ký tự đầu tiên của tập dữ liệu thực tế.
 
-Kết quả khi áp dụng tokenizer trên 500 ký tự đầu tiên của tập dữ liệu `UD_English-EWT`:
 
-```plaintext
 --- Tokenizing Sample Text from UD_English-EWT ---
 Original Sample: # newdoc id = weblog-XML_BLOG_00001_20040301-0001
 # sent_id = weblog-XML_BLOG_00001_20040301-0001_1...
@@ -82,18 +80,19 @@ RegexTokenizer Output (first 20 tokens):
 III. Giải thích kết quả và phân tích
 1. So sánh SimpleTokenizer và RegexTokenizer
 
-Trên các câu mẫu đơn giản: Cả hai tokenizer đều cho ra kết quả gần như giống hệt nhau. SimpleTokenizer hoạt động tốt vì các câu này chỉ chứa các dấu câu cơ bản đã được xử lý trước.
+Trên các câu mẫu đơn giản: Cả hai tokenizer đều cho kết quả đầu ra giống hệt nhau. Điều này cho thấy SimpleTokenizer đủ tốt để xử lý các văn bản sạch, chỉ chứa các dấu câu cơ bản.
 
-Trên dữ liệu thực tế (UD_English-EWT): Sự khác biệt trở nên rõ rệt:
+Trên dữ liệu thực tế (UD_English-EWT): Sự khác biệt trở nên rất rõ ràng.
 
-SimpleTokenizer: Đã thất bại trong việc xử lý các chuỗi phức tạp như weblog-xml_blog_00001_20040301-0001. Vì nó chỉ tách dựa trên khoảng trắng nên toàn bộ chuỗi này được coi là một token duy nhất. Điều này là không chính xác vì chuỗi này chứa nhiều thông tin có thể tách rời (từ, số, dấu gạch ngang).
+SimpleTokenizer coi chuỗi weblog-xml_blog_00001_20040301-0001 là một token duy nhất. Điều này là do nó chỉ tách dựa trên khoảng trắng và không được lập trình để hiểu các ký tự như - hoặc _.
 
-RegexTokenizer: Thể hiện sự vượt trội rõ ràng. Nó đã phân tách chuỗi trên một cách thông minh thành ['weblog', '-', 'xml_blog_00001_20040301', '-', '0001']. Biểu thức chính quy đã nhận diện được các chuỗi chữ và số (\w+) và các ký tự đặc biệt ([^\w\s]) như các token riêng biệt. Kết quả này chi tiết và hữu ích hơn nhiều cho các bước xử lý sau này.
+RegexTokenizer đã thể hiện sự vượt trội khi phân tách chuỗi đó thành các thành phần nhỏ hơn và có ý nghĩa hơn: ['weblog', '-', 'xml_blog_00001_20040301', '-', '0001']. Cách tiếp cận này linh hoạt hơn rất nhiều, có thể xử lý các token chứa ký tự đặc biệt mà không cần định nghĩa trước.
 
 2. Khó khăn gặp phải và cách giải quyết
 
-Khó khăn: Thách thức chính với SimpleTokenizer là làm thế nào để tách các dấu câu dính liền với từ (ví dụ: world!) mà không dùng đến regex. Nếu chỉ dùng text.split() thì "world!" sẽ là một token.
+Khó khăn: Thử thách lớn nhất với SimpleTokenizer là tách dấu câu khỏi từ mà không ảnh hưởng đến các trường hợp như từ viết tắt hoặc số thập phân (mặc dù không có trong yêu cầu lab này).
 
-Giải pháp: Em đã giải quyết vấn đề này bằng một bước tiền xử lý đơn giản: thay thế mỗi dấu câu p trong danh sách ['.', ',', '?', '!'] bằng " " + p + " ". Điều này đảm bảo luôn có khoảng trắng xung quanh các dấu câu, giúp phương thức .split() hoạt động chính xác.
+Giải pháp: Em đã chọn một giải pháp an toàn là thêm khoảng trắng vào hai bên của một tập hợp các dấu câu xác định trước. Cách này đơn giản và đáp ứng được yêu cầu của bài lab.
 
-Nhận xét: Mặc dù SimpleTokenizer dễ cài đặt, nó thiếu đi sự linh hoạt và dễ bị "bẻ gãy" bởi các trường hợp không lường trước. RegexTokenizer, tuy phức tạp hơn để thiết kế ban đầu, nhưng lại cung cấp một giải pháp mạnh mẽ và tổng quát hơn cho bài toán tách từ trong thực tế.
+Kết luận: SimpleTokenizer là một điểm khởi đầu tốt để hiểu về tokenization, nhưng RegexTokenizer mới là công cụ mạnh mẽ và phù hợp hơn cho các ứng dụng trong thế giới thực, nơi dữ liệu thường không đồng nhất và chứa nhiều trường hợp đặc biệt.
+

@@ -65,34 +65,9 @@ SimpleTokenizer: ['let', "'", 's', 'see', 'how', 'it', 'handles', '123', 'number
 RegexTokenizer:  ['let', "'", 's', 'see', 'how', 'it', 'handles', '123', 'numbers', 'and', 'punctuation', '!']
 2. Output trên dataset UD_English-EWT
 
-Kết quả khi áp dụng trên 500 ký tự đầu tiên của tập dữ liệu thực tế.
+2.2. Ví dụ dataset UD_English-EWT (20 tokens đầu)
+SimpleTokenizer =>
+['al-zaman', ':', 'american', 'forces', 'killed', 'shaikh', 'abdullah', 'al-ani,', 'the', 'preacher', 'at', 'the', 'mosque', 'in', 'the', 'town', 'of', 'qaim,', 'near', 'the']
 
-
---- Tokenizing Sample Text from UD_English-EWT ---
-Original Sample: # newdoc id = weblog-XML_BLOG_00001_20040301-0001
-# sent_id = weblog-XML_BLOG_00001_20040301-0001_1...
-
-SimpleTokenizer Output (first 20 tokens): 
-['#', 'newdoc', 'id', '=', 'weblog-xml_blog_00001_20040301-0001', '#', 'sent_id', '=', 'weblog-xml_blog_00001_20040301-0001_1', '#', 'text', '=', 'from', 'the', 'exchange', 'in', 'honolulu', ',', 'to', 'the']
-
-RegexTokenizer Output (first 20 tokens): 
-['#', 'newdoc', 'id', '=', 'weblog', '-', 'xml_blog_00001_20040301', '-', '0001', '#', 'sent_id', '=', 'weblog', '-', 'xml_blog_00001_20040301', '-', '0001', '_', '1', '#']
-III. Giải thích kết quả và phân tích
-1. So sánh SimpleTokenizer và RegexTokenizer
-
-Trên các câu mẫu đơn giản: Cả hai tokenizer đều cho kết quả đầu ra giống hệt nhau. Điều này cho thấy SimpleTokenizer đủ tốt để xử lý các văn bản sạch, chỉ chứa các dấu câu cơ bản.
-
-Trên dữ liệu thực tế (UD_English-EWT): Sự khác biệt trở nên rất rõ ràng.
-
-SimpleTokenizer coi chuỗi weblog-xml_blog_00001_20040301-0001 là một token duy nhất. Điều này là do nó chỉ tách dựa trên khoảng trắng và không được lập trình để hiểu các ký tự như - hoặc _.
-
-RegexTokenizer đã thể hiện sự vượt trội khi phân tách chuỗi đó thành các thành phần nhỏ hơn và có ý nghĩa hơn: ['weblog', '-', 'xml_blog_00001_20040301', '-', '0001']. Cách tiếp cận này linh hoạt hơn rất nhiều, có thể xử lý các token chứa ký tự đặc biệt mà không cần định nghĩa trước.
-
-2. Khó khăn gặp phải và cách giải quyết
-
-Khó khăn: Thử thách lớn nhất với SimpleTokenizer là tách dấu câu khỏi từ mà không ảnh hưởng đến các trường hợp như từ viết tắt hoặc số thập phân (mặc dù không có trong yêu cầu lab này).
-
-Giải pháp: Em đã chọn một giải pháp an toàn là thêm khoảng trắng vào hai bên của một tập hợp các dấu câu xác định trước. Cách này đơn giản và đáp ứng được yêu cầu của bài lab.
-
-Kết luận: SimpleTokenizer là một điểm khởi đầu tốt để hiểu về tokenization, nhưng RegexTokenizer mới là công cụ mạnh mẽ và phù hợp hơn cho các ứng dụng trong thế giới thực, nơi dữ liệu thường không đồng nhất và chứa nhiều trường hợp đặc biệt.
-
+RegexTokenizer =>
+['al', '-', 'zaman', ':', 'american', 'forces', 'killed', 'shaikh', 'abdullah', 'al', '-', 'ani', ',', 'the', 'preacher', 'at', 'the', 'mosque', 'in', 'the']

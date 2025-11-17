@@ -1,6 +1,6 @@
 # Lab 5
 
-## A. Làm quen với PyTorch và Token Classification (part1.ipynb)
+## A. Làm quen với PyTorch và Token Classification (task1.ipynb)
 
 ### 1. Mục tiêu
 - Làm quen với thao tác với **Tensor** trong PyTorch.  
@@ -29,7 +29,7 @@
 
 ---
 
-## B. Phân loại văn bản với RNN/LSTM (part2.ipynb)
+## B. Phân loại văn bản với RNN/LSTM (task2.ipynb)
 
 ### 1. Mục tiêu
 So sánh hiệu năng của 4 pipeline phân loại văn bản:

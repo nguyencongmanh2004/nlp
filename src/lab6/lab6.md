@@ -59,7 +59,7 @@ thủ đô (**capital**) của Việt Nam.
 
 ## **3. Tại sao các mô hình Encoder-only như BERT phù hợp cho tác vụ này?**
 
-### **✔ 1. Hiểu ngữ cảnh hai chiều (Bidirectional Context)**
+### ** 1. Hiểu ngữ cảnh hai chiều (Bidirectional Context)**
 
 Encoder của Transformer sử dụng **self-attention hai chiều**, cho phép
 mô hình nhìn cả **bên trái** và **bên phải** của từ bị che `<mask>` cùng
@@ -67,12 +67,12 @@ lúc.
 
 → Rất phù hợp cho Masked Language Modeling.
 
-### **✔ 2. Thiết kế tối ưu cho các tác vụ hiểu ngôn ngữ**
+### ** 2. Thiết kế tối ưu cho các tác vụ hiểu ngôn ngữ**
 
 Encoder-only phù hợp với: - Khôi phục Masked Token (MLM) - Phân loại văn
 bản - NER - Trả lời câu hỏi (QA)
 
-### **✔ 3. Không phù hợp cho sinh văn bản**
+### ** 3. Không phù hợp cho sinh văn bản**
 
 Encoder-only không dự đoán token tiếp theo nên **không dùng cho text
 generation** --- đó là nhiệm vụ của mô hình decoder-only (GPT).
@@ -133,18 +133,18 @@ phân phối ngôn ngữ chung.
 
 ## 2.2. Tại sao các mô hình Decoder-only (như GPT) phù hợp cho tác vụ sinh văn bản?
 
-### ✔ Tối ưu cho Next Token Prediction
+### Tối ưu cho Next Token Prediction
 
 GPT được huấn luyện để dự đoán **token tiếp theo** trong chuỗi\
 → giúp mô hình sinh văn bản trôi chảy theo hướng **một chiều
 (unidirectional)**.
 
-### ✔ Kiến trúc Autoregressive
+###  Kiến trúc Autoregressive
 
 Mỗi token **chỉ nhìn thấy token phía trước**, giúp văn bản sinh ra tự
 nhiên và mạch lạc theo thời gian.
 
-### ✔ Hoạt động tốt với các tác vụ:
+### Hoạt động tốt với các tác vụ:
 
 -   Text Generation
 -   Story/Paragraph Completion
@@ -190,6 +190,7 @@ sentence_embedding = sum_embeddings / sum_mask
 
 print("Kích thước của vector:", sentence_embedding.shape)
 # ... in vector kết quả
+```
 
 ## 2. Kết quả
 

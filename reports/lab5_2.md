@@ -29,7 +29,7 @@
 
 ---
 
-## B. Phân loại văn bản với RNN/LSTM (task2.ipynb)
+## B. Phân loại văn bản với RNN/LSTM 
 
 ### 1. Mục tiêu
 So sánh hiệu năng của 4 pipeline phân loại văn bản:

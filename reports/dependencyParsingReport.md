@@ -1,104 +1,233 @@
 
-
 # BÁO CÁO THỰC HÀNH LAB 6: PHÂN TÍCH CÚ PHÁP PHỤ THUỘC (DEPENDENCY PARSING)
 
 **Họ và tên:** Nguyễn Công Mạnh
 
+## 1. Mục tiêu
+
+* Sử dụng thư viện `spaCy` để phân tích cấu trúc ngữ pháp câu (Dependency Parsing).
+* Trực quan hóa cây phụ thuộc.
+* Duyệt cây (Tree Traversal) để trích xuất thông tin (Chủ ngữ, Tân ngữ, Động từ chính, Cụm danh từ).
+
 ---
 
-## 1. Mục tiêu và Công cụ
+## 2. Nội dung thực hiện và Kết quả
 
-Bài thực hành nhằm mục đích làm quen với kỹ thuật Phân tích cú pháp phụ thuộc (Dependency Parsing) để hiểu cấu trúc ngữ pháp của câu thông qua quan hệ Head-Dependent. Công cụ chính được sử dụng là thư viện **spaCy** với mô hình ngôn ngữ tiếng Anh `en_core_web_md` (mô hình tầm trung có hỗ trợ vector và cú pháp đầy đủ).
+### Phần 1: Cài đặt và Khởi tạo
 
-## 2. Các bước thực hiện và Kết quả
+Tôi đã tiến hành cài đặt thư viện và tải mô hình ngôn ngữ mức trung bình (`md` - medium) để đảm bảo có đủ thông tin vector và cú pháp.
 
-### Phần 1: Cài đặt và Khởi tạo môi trường
+**Code thực hiện:**
 
-* **Thực hiện:** Đã cài đặt thành công thư viện `spacy` và tải mô hình `en_core_web_md` thông qua lệnh pip và python module.
-* **Kết quả:** Môi trường đã sẵn sàng, các thư viện phụ thuộc (numpy, requests,...) đều đã thỏa mãn yêu cầu.
+```bash
+!pip install -U spacy
+!python -m spacy download en_core_web_md
+```
 
-### Phần 2: Phân tích câu và Trực quan hóa (Visualization)
+**Kết quả:** Cài đặt thành công, các thư viện phụ thuộc đã thỏa mãn.
 
-* **Thực hiện:**
+### Phần 2: Phân tích câu và Trực quan hóa
 
-  * Sử dụng `spacy.load("en_core_web_md")` để tải mô hình.
-  * Phân tích câu mẫu: *"The quick brown fox jumps over the lazy dog."*
-  * Sử dụng `displacy.serve` để dựng server hiển thị cây cú pháp.
-* **Trả lời câu hỏi (Dựa trên kết quả thực nghiệm):**
+**Mục tiêu:** Xác định quan hệ giữa các từ trong câu *"The quick brown fox jumps over the lazy dog."*
 
-  1. **Từ gốc (ROOT):** Là từ **"jumps"** (Động từ chính của câu).
-  2. **Các từ phụ thuộc của "jumps":** Bao gồm **"fox"** (chủ ngữ - nsubj) và **"over"** (giới từ - prep).
-  3. **"fox" là Head của những từ nào:** "fox" là từ điều khiển (Head) của các từ: **"The"** (mạo từ - det), **"quick"** (tính từ - amod), và **"brown"** (tính từ - amod).
+**Code thực hiện:**
 
-### Phần 3: Truy cập thành phần trong cây phụ thuộc
+```python
+import spacy
+from spacy import displacy
 
-* **Thực hiện:** Viết code duyệt qua từng `token` trong câu *"Apple is looking at buying U.K. startup for $1 billion"*.
-* **Kết quả:** Đã trích xuất thành công bảng thông tin gồm: Text, Nhãn phụ thuộc (Dep), Từ cha (Head Text), Loại từ của cha (Head POS) và Danh sách từ con (Children). Ví dụ:
+# Tải mô hình
+nlp = spacy.load("en_core_web_md")
 
-  * *Apple* phụ thuộc vào *looking* với quan hệ `nsubj`.
-  * *looking* là `ROOT` của câu.
+# Phân tích câu
+text = "The quick brown fox jumps over the lazy dog."
+doc = nlp(text)
+
+# Hiển thị cây (Lưu ý: Trong Notebook nên dùng render thay vì serve)
+# displacy.serve(doc, style='dep')
+```
+
+**Trả lời câu hỏi từ kết quả phân tích:**
+
+1. **Từ gốc (ROOT):** `jumps`.
+2. **Từ phụ thuộc của "jumps":** `fox` (chủ ngữ) và `over` (giới từ).
+3. **"Fox" là Head của:** `The` (det), `quick` (amod), `brown` (amod).
+
+### Phần 3: Truy cập thuộc tính Token
+
+**Mục tiêu:** Hiển thị chi tiết nhãn quan hệ (Dependency labels) và từ cha (Head) của câu *"Apple is looking at buying U.K. startup for $1 billion"*.
+
+**Code thực hiện:**
+
+```python
+text = "Apple is looking at buying U.K. startup for $1 billion"
+doc = nlp(text)
+
+print(f"{'TEXT':<12} | {'DEP':<10} | {'HEAD TEXT':<12} | {'HEAD POS':<8} | {'CHILDREN'}")
+print("-" * 70)
+
+for token in doc:
+    children = [child.text for child in token.children]
+    print(f"{token.text:<12} | {token.dep_:<10} | {token.head.text:<12} | {token.head.pos_:<8} | {children}")
+```
+
+**Kết quả trích xuất (Một phần):**
+
+* **Apple**: `nsubj` (chủ ngữ) của *looking*.
+* **looking**: `ROOT` (động từ chính) của câu.
+* **U.K.**: `compound` (danh từ ghép) bổ nghĩa cho *startup*.
 
 ### Phần 4: Trích xuất thông tin (Information Extraction)
 
-Tôi đã giải quyết hai bài toán trích xuất thông tin dựa trên quan hệ ngữ pháp:
+#### 4.1. Tìm bộ ba (Chủ ngữ - Động từ - Tân ngữ)
 
-1. **Tìm bộ ba (Chủ ngữ - Động từ - Tân ngữ):**
+**Code thực hiện:**
 
-   * Duyệt qua các token là `VERB`.
-   * Tìm trong `token.children` các từ có nhãn `nsubj` (chủ ngữ) và `dobj` (tân ngữ).
-   * *Kết quả:* Trích xuất được `(cat, chased, mouse)` và `(dog, watched, them)`.
-2. **Tìm tính từ bổ nghĩa cho danh từ:**
+```python
+text = "the cat chased the mouse and the dog watched them"
+doc = nlp(text)
 
-   * Duyệt qua các token là `NOUN`.
-   * Tìm trong `token.children` các từ có nhãn `amod`.
-   * *Kết quả:* Danh từ "cat" có các tính từ bổ nghĩa là `['big', 'fluffy', 'white']`.
+for token in doc:
+    if token.pos_ == "VERB":
+        verb = token.text
+        subject = ""
+        obj = ""
+        # Tìm chủ ngữ và tân ngữ trong con của động từ
+        for child in token.children:
+            if child.dep_ == "nsubj":
+                subject = child.text
+            if child.dep_ == "dobj":
+                obj = child.text
+        
+        if subject and obj:
+            print(f"Found Triplet: ({subject}, {verb}, {obj})")
+```
 
-### Phần 5: Bài tập tự luyện
+**Kết quả:**
 
-Đây là phần nâng cao, tôi đã tự xây dựng các hàm xử lý:
+* Found Triplet: `(cat, chased, mouse)`
+* Found Triplet: `(dog, watched, them)`
 
-1. **Tìm động từ chính (`find_main_verb`):**
+#### 4.2. Tìm tính từ bổ nghĩa cho danh từ
 
-   * Logic: Duyệt token, nếu `token.dep_ == "ROOT"` thì trả về.
-   * Kết quả: Tìm được động từ **"decided"** cho câu ví dụ.
+**Code thực hiện:**
 
-2. **Trích xuất cụm danh từ thủ công (`get_noun_chunks_manual`):**
+```python
+text = "the big, fluffy white cat is sleeping on the warm mat."
+doc = nlp(text)
 
-   * Logic: Duyệt token, nếu là `NOUN` hoặc `PROPN` thì lấy `token.subtree`. Có xử lý loại bỏ trường hợp danh từ ghép (`compound`) để tránh trùng lặp.
-   * Kết quả: Code thủ công trích xuất được *"The manager"* và *"the meeting"*, tương đồng với kết quả của `spacy.noun_chunks`.
+for token in doc:
+    if token.pos_ == "NOUN":
+        adjectives = []
+        for child in token.children:
+            if child.dep_ == "amod":
+                adjectives.append(child.text)
+        if adjectives:
+            print(f"Danh từ '{token.text}' được bổ nghĩa bởi các tính từ: {adjectives}")
+```
 
-3. **Tìm đường đi ngắn nhất đến ROOT (`get_path_to_root`):**
+**Kết quả:**
 
-   * Logic: Sử dụng vòng lặp `while token.head != token` để truy ngược từ từ con lên từ cha cho đến khi gặp ROOT.
-   * Kết quả: Tìm được đường đi từ "lazy" đến ROOT: `lazy -> dog -> over -> jumps`.
+* Danh từ 'cat': `['big', 'fluffy', 'white']`
+* Danh từ 'mat': `['warm']`
+
+### Phần 5: Bài tập tự luyện (Nâng cao)
+
+#### Bài 1: Tìm động từ chính (Main Verb)
+
+**Code thực hiện:**
+
+```python
+def find_main_verb(doc):
+    for token in doc:
+        if token.dep_ == "ROOT":
+            return token.text
+    return None
+
+sentence = "The manager decided to cancel the meeting because it was..."
+doc = nlp(sentence)
+print(f"Main Verb: {find_main_verb(doc)}")
+```
+
+**Kết quả:** Main Verb: `decided`.
+
+#### Bài 2: Trích xuất cụm danh từ (Noun Chunks) thủ công
+
+Phần này yêu cầu xử lý logic để tránh lấy trùng lặp các danh từ ghép (như "U.K." trong "U.K. startup").
+
+**Code thực hiện:**
+
+```python
+def get_noun_chunks_manual(doc):
+    print(f"{'HEAD NOUN':<15} {'DETECTED CHUNK'}")
+    print("-" * 40)
+    for token in doc:
+        # Chỉ xét NOUN hoặc PROPN
+        if token.pos_ in ["NOUN", "PROPN"]:
+            # Bỏ qua nếu là một phần của danh từ ghép (để tránh trùng lặp)
+            if token.dep_ == "compound":
+                continue
+            # Lấy toàn bộ cây con (subtree) của danh từ đó
+            chunk_words = [t.text for t in token.subtree]
+            chunk_text = " ".join(chunk_words)
+            print(f"{token.text:<15} {chunk_text}")
+
+# So sánh với spaCy
+sentence = "The manager decided to cancel the meeting..."
+doc = nlp(sentence)
+get_noun_chunks_manual(doc)
+```
+
+**Kết quả:** Code thủ công trích xuất chính xác: `The manager`, `the meeting`... tương đương với kết quả tích hợp sẵn của spaCy.
+
+#### Bài 3: Tìm đường đi ngắn nhất tới ROOT
+
+Đây là bài toán duyệt ngược cây (Bottom-up traversal).
+
+**Code thực hiện:**
+
+```python
+def get_path_to_root(token):
+    path = []
+    # Duyệt ngược lên cha cho đến khi gặp ROOT (nơi head == chính nó)
+    while token.head != token:
+        path.append(token)
+        token = token.head
+    path.append(token) # Thêm ROOT vào cuối
+    return path
+
+# Test với từ "lazy"
+sentence = "The quick brown fox jumps over the lazy dog."
+doc = nlp(sentence)
+selected_token = doc[6] # "lazy"
+path = get_path_to_root(selected_token)
+
+# In kết quả
+for i, token in enumerate(path):
+    arrow = "-->" if i < len(path) - 1 else "(ROOT)"
+    print(f"{token.text:<10} [{token.dep_}] {arrow}")
+```
+
+**Kết quả:** Đường đi tìm được (4 bước): `lazy` [amod] --> `dog` [pobj] --> `over` [prep] --> `jumps` [ROOT].
 
 ---
 
-## 3. Các khó khăn và Vấn đề gặp phải
+## 3. Khó khăn và Vấn đề gặp phải
 
-Trong quá trình thực hiện Lab 6, tôi đã gặp và xử lý một số vấn đề sau:
+Trong quá trình thực hiện, tôi đã ghi nhận các vấn đề sau:
 
-**1. Vấn đề tương thích môi trường với `displacy`:**
+1. **Lỗi hiển thị DisplaCy:**
 
-* *Mô tả:* Khi chạy lệnh `displacy.serve(doc, style='dep')` trong môi trường Jupyter Notebook/Google Colab, hệ thống báo cảnh báo `UserWarning: [W011] ... calling displacy.serve from within a Jupyter notebook`.
-* *Nguyên nhân:* Hàm `serve` cố gắng khởi tạo một web server mới, trong khi môi trường Notebook đã có server riêng.
-* *Giải pháp/Bài học:* Theo gợi ý của log lỗi, trong môi trường Notebook nên sử dụng `displacy.render` thay vì `displacy.serve` để hiển thị hình ảnh trực tiếp ngay trong cell code thay vì phải mở tab trình duyệt mới (localhost:5000).
+   * **Vấn đề:** Khi chạy `displacy.serve()` trong Jupyter Notebook, hệ thống báo cảnh báo `UserWarning: [W011]`.
+   * **Nguyên nhân:** `serve()` cố gắng chạy một web server mới, xung đột với môi trường Notebook hiện tại.
+   * **Khắc phục:** Thay thế bằng `displacy.render(doc, style='dep', jupyter=True)` để hiển thị trực tiếp kết quả ngay trong dòng code thay vì mở cổng localhost mới.
 
-**2. Phức tạp trong logic trích xuất cụm danh từ (Noun Chunks):**
+2. **Xử lý Danh từ ghép (Compound Nouns):**
 
-* *Mô tả:* Khi tự viết hàm `get_noun_chunks_manual` ở Bài tập 2, việc chỉ lấy `subtree` của một danh từ là chưa đủ.
-* *Khó khăn:* Nếu câu có danh từ ghép (ví dụ: "U.K. startup"), cả "U.K." và "startup" đều là danh từ. Nếu không xử lý kỹ, code sẽ in ra hai cụm chồng chéo nhau.
-* *Giải pháp:* Tôi đã phải thêm điều kiện kiểm tra `if token.dep_ == "compound": continue` để bỏ qua các danh từ phụ, chỉ bắt đầu trích xuất từ danh từ chính (Head Noun) của cụm đó.
-
-**3. Xác định quan hệ Head - Dependent:**
-
-* *Khó khăn:* Ban đầu việc xác định đâu là Head, đâu là Child khi nhìn vào câu văn bản thuần túy khá trừu tượng.
-* *Giải pháp:* Việc sử dụng thuộc tính `token.head` và `token.children` kết hợp với `displacy` giúp trực quan hóa mối quan hệ này rõ ràng hơn (mũi tên luôn đi từ Head trỏ đến Child).
-
----
+   * **Vấn đề:** Khi trích xuất cụm danh từ (Bài tập 2), nếu chỉ lấy tất cả `NOUN`, kết quả sẽ bị dư thừa. Ví dụ "U.K. startup", cả 2 từ đều là danh từ.
+   * **Giải pháp:** Tôi đã thêm điều kiện `if token.dep_ == "compound": continue` để bỏ qua danh từ phụ, chỉ bắt đầu trích xuất từ danh từ chính (Head noun).
 
 ## 4. Kết luận
 
-Buổi thực hành đã giúp tôi nắm vững cách spaCy biểu diễn câu văn dưới dạng cây phụ thuộc. Tôi đã có thể chuyển đổi từ lý thuyết ngữ pháp (Chủ ngữ, Vị ngữ, Bổ ngữ) sang code Python thực tế để trích xuất thông tin tự động. Kỹ năng duyệt cây (Tree Traversal) học được trong bài 3 (tìm đường đi đến Root) là nền tảng quan trọng để xử lý các bài toán NLP phức tạp hơn như tóm tắt văn bản hay trích xuất quan hệ.
-
+Bài thực hành đã hoàn thành đầy đủ các mục tiêu đề ra. Tôi đã nắm được cách spaCy tổ chức dữ liệu dưới dạng cây, hiểu rõ vai trò của `HEAD` và `CHILDREN` trong việc xác định ý nghĩa câu. Các đoạn code tự viết (tìm đường đi, trích xuất cụm từ) đã hoạt động chính xác và khớp với kết quả lý thuyết.
 
